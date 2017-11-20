@@ -5,17 +5,20 @@
  */
 package Logica;
 
-
-import static Logica.Proceso.BLOQUEADO;
-import static Logica.Proceso.EJECUCION;
-import static Logica.Proceso.LISTO;
+import static Logica.Configuracion.BLOQUEADO;
+import static Logica.Configuracion.EJECUCION;
+import static Logica.Configuracion.LISTO;
+import static Logica.Configuracion.TERMINADO;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class ListaProceso {
+
     public ArrayList<Proceso> procesos = new ArrayList();
     public ArrayList<Recurso> recurso;
-    public ListaProceso(){
+    public Memoria memoria;
+
+    public ListaProceso() {
         recurso = new ArrayList();
         Recurso r1 = new Recurso(1);
         Recurso r2 = new Recurso(2);
@@ -23,105 +26,87 @@ public class ListaProceso {
         recurso.add(r1);
         recurso.add(r2);
         recurso.add(r3);
-        
+        memoria = new Memoria();
     }
-    public void aProceso(int tam, int num, String recu){
-        Proceso tmpPro = new Proceso(tam, num, recu);
-        tmpPro.aEstado(LISTO);        
+
+    public void aProceso(int num,String nom, int tam,boolean prio, String recP) {
+        Proceso tmpPro = new Proceso(num, nom, tam, prio, recP);
+        tmpPro.aEstado(LISTO);
         this.procesos.add(tmpPro);
+        this.memoria.aProceso(tmpPro);
     }
-    public ArrayList<Byte> vEstadoProceso(){
+
+    public ArrayList<Byte> vEstadoProceso() {
         ArrayList<Byte> listaProcesos = new ArrayList<>();
-        for (Proceso pro : this.procesos){
+        for (Proceso pro : this.procesos) {
             listaProcesos.add(pro.vEstado());
         }
         return listaProcesos;
     }
-    public String vProcBloqueado(){
-        String listaProcesos="";
-        for (Proceso pro : this.procesos){
-            if(pro.vEstado() == BLOQUEADO){
-                listaProcesos= listaProcesos.concat(pro.vNombre().concat(", "));
-            }
-        }
-        return listaProcesos;
-    }
-    public String vProcListo(){
-        String listaProcesos="";
-        for (Proceso pro : this.procesos){
-            if(pro.vEstado() == LISTO){
-                listaProcesos= listaProcesos.concat(pro.vNombre().concat(", "));
-            }
-        }
-        return listaProcesos;
-    }
-    public String vProcEjecucion(){
-        String listaProcesos="";
-        for (Proceso pro : this.procesos){
-            if(pro.vEstado() == EJECUCION){
-                listaProcesos = listaProcesos.concat(pro.vNombre().concat(", "));
-            }
-        }
-        return listaProcesos;
-    }
-    public void cambiarEstProceso(int tiempo, int proc){
-        for (Proceso pro: this.procesos){
-            if(this.bloqueo(pro)){
+    public void cambiarEstProceso(int tiempo, int proc) {
+        for (Proceso pro : this.procesos) {
+            if (this.bloqueo(pro)) {
                 pro.aEstado(BLOQUEADO);
-            }else if(pro.vNumPro() == proc && !pro.completo()){
-               pro.aEstado(EJECUCION);
-               pro.rTamanio();
-               this.liberar(pro);
-            }else if(!pro.completo())
+            } else if (pro.vIdPro() == proc && pro.vEstado() != TERMINADO) {
+                pro.aEstado(EJECUCION);
+                this.liberar(pro);
+                if(this.memoria.procesoMemoria(proc))
+                    pro.aEstado(TERMINADO);
+            } else if (pro.vEstado() != TERMINADO) {
                 pro.aEstado(LISTO);
+            }
         }
     }
-    public boolean bloqueo(Proceso p){//tiempo(part entera > 1) de bloqueo
+
+    public boolean bloqueo(Proceso p) {
+        if(p.recursosP.length() == 0)
+            return false;
         String[] re = p.recursosP.split(",");
-        int con=0;
-        for(String i : re){
-            for(Recurso r : recurso){
-                if(Integer.parseInt(i)==r.id && r.RetornarEstado()){
+        int con = 0;
+        for (String i : re) {
+            for (Recurso r : recurso) {
+                if (Integer.parseInt(i) == r.id && (r.RetornarEstado() || r.idProc == p.vIdPro())) {
                     con++;
                 }
             }
         }
-        if(re.length == con){
-            for(String i : re){
-                for(Recurso r : recurso){
-                    if(Integer.parseInt(i) == r.id){
-                        r.aEstado(false);
+        if (re.length == con) {
+            for (String i : re) {
+                for (Recurso r : recurso) {
+                    if (Integer.parseInt(i) == r.id) {
+                        r.aEstado(false,p.vIdPro());
                     }
                 }
             }
             return false;
-        }else return true;
-            
-       /* ;*/
+        } else {
+            return true;
+        }
     }
-    public void liberar(Proceso p){
+
+    public void liberar(Proceso p) {
+        if(p.recursosP.length() == 0)
+            return;
         String[] re = p.recursosP.split(",");
-        int con=0;
         Random rn = new Random();
-        int uso = (int)(rn.nextDouble()*10);
-        for(String i : re){
-            for(Recurso r : recurso){
-                if(Integer.parseInt(i)==r.id 
-                        && (uso==1 || uso ==2)){
-                    r.aEstado(true);
+        int uso = (int) (rn.nextDouble() * 10);
+        for (String i : re) {
+            for (Recurso r : recurso) {
+                if (Integer.parseInt(i) == r.id
+                        && (uso == 1 || uso == 2)) {
+                    r.aEstado(true,0);
                 }
             }
         }
     }
-    public boolean termina(){
-        int con=0;
-        for (Proceso pro : this.procesos){
-            if(pro.vTamanio()==0)
+
+    public boolean termina() {
+        int con = 0;
+        for(Proceso pro : this.procesos) {
+            if (pro.vEstado() == TERMINADO) {
                 con++;
+            }
         }
-        if(procesos.size() == con)
-            return true;
-        else
-            return false;
+        return procesos.size() == con;
     }
 }

@@ -4,12 +4,10 @@
  * and open the template in the editor.
  */
 package Logica;
-
-import java.util.Random;
-
 public class Recurso {
     public int id;
     boolean estado;
+    public int idProc;
     public Recurso(int identificador){
         id=identificador;
         estado=true;
@@ -17,8 +15,9 @@ public class Recurso {
     public boolean RetornarEstado(){
         return estado;
     }
-    public void aEstado(boolean es){
+    public void aEstado(boolean es, int pro){
         estado = es;
+        idProc = pro;
     }
     
 }

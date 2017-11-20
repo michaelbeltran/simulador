@@ -2,27 +2,33 @@
 package Vista;
 
 import Logica.*;
-import static Logica.Proceso.BLOQUEADO;
-import static Logica.Proceso.EJECUCION;
-import static Logica.Proceso.LISTO;
+import static Logica.Configuracion.BLOQUEADO;
+import static Logica.Configuracion.CANTIDADP;
+import static Logica.Configuracion.EJECUCION;
+import static Logica.Configuracion.LISTO;
+import static Logica.Configuracion.TERMINADO;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.JButton;
 public class Simulador extends javax.swing.JFrame implements ActionListener{
 
-    DefaultTableModel modelo;
-    DefaultTableModel modelo1;
-    DefaultTableModel modelo2;
-    DefaultTableModel modelo3;
-    DefaultTableModel modelo4;
+    DefaultTableModel nuevo;
+    DefaultTableModel listo;
+    DefaultTableModel ejecucion;
+    DefaultTableModel bloqueado;
+    DefaultTableModel terminado;
+    DefaultTableModel memlogica;
+    DefaultTableModel memvirtual;
     ListaProceso l;
     int delay = 1000; //milliseconds
     int procesos=1;
     int tiempo=0;
     int numP = 1;
     Timer temporizador;
+    ArrayList<Integer>bProTer;
     
     
     
@@ -31,25 +37,34 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         initComponents();
         String cabecera[]={"Proceso","Memoria"};
         String datos[] []={};
-        String cabecera1[]={"Proceso","Memoria","Tiempo"};
+        String cabecera1[]={"Proceso"};
         String datos1[] []={};
-        String cabecera2[]={"Proceso","Memoria","Tiempo"};
+        String cabecera2[]={"Proceso"};
         String datos2[] []={};
-        String cabecera3[]={"Proceso","Tiempo"};
+        String cabecera3[]={"Proceso"};
         String datos3[] []={};
-        String cabecera4[]={"Proceso","Tiempo"};
+        String cabecera4[]={"Proceso"};
         String datos4[] []={};
-        modelo=new DefaultTableModel(datos,cabecera);
-        modelo1=new DefaultTableModel(datos1,cabecera1);
-        modelo2=new DefaultTableModel(datos2,cabecera2);
-        modelo3=new DefaultTableModel(datos3,cabecera3);
-        modelo4=new DefaultTableModel(datos4,cabecera4);
-        tablaprocesos.setModel(modelo);
-        tablaEspera.setModel(modelo1);
-        tablaEjecutar.setModel(modelo2);
-        tablaBloqueado.setModel(modelo3);
-        tablaTerminado.setModel(modelo4);
+         String cabecera5[]={" ","Proceso","Pagina"};
+        String datos5[] []={};
+         String cabecera6[]={" ", "Proceso","Pagina"};
+        String datos6[] []={};
+        nuevo=new DefaultTableModel(datos,cabecera);
+        listo=new DefaultTableModel(datos1,cabecera1);
+        ejecucion=new DefaultTableModel(datos2,cabecera2);
+        bloqueado=new DefaultTableModel(datos3,cabecera3);
+        terminado=new DefaultTableModel(datos4,cabecera4);
+        memlogica=new DefaultTableModel(datos5,cabecera5);
+        memvirtual=new DefaultTableModel(datos6,cabecera6);
+        tablaprocesos.setModel(nuevo);
+        tablaEspera.setModel(listo);
+        tablaEjecutar.setModel(ejecucion);
+        tablaBloqueado.setModel(bloqueado);
+        tablaTerminado.setModel(terminado);
+        Tablalogica.setModel(memlogica);
+        TablaVirtual.setModel(memvirtual);
         l = new ListaProceso();
+        bProTer = new ArrayList();
     }
 
     /**
@@ -72,11 +87,11 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         jLabel13 = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
         txtNombre = new javax.swing.JTextField();
-        txtPrioridad = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
         recurso1 = new javax.swing.JCheckBox();
         recurso2 = new javax.swing.JCheckBox();
         recurso3 = new javax.swing.JCheckBox();
+        prioridad = new javax.swing.JCheckBox();
         jfrmEjecutar = new javax.swing.JFrame();
         jScrollPane2 = new javax.swing.JScrollPane();
         tablaEspera = new javax.swing.JTable();
@@ -95,10 +110,16 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         tablaprocesos = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        Tablalogica = new javax.swing.JTable();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        TablaVirtual = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        txtnumprocesos = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         btnnumprocesos = new javax.swing.JButton();
+        btnSalir = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         jfrmProcesos.setMaximizedBounds(new java.awt.Rectangle(525, 380, 380, 380));
         jfrmProcesos.setMinimumSize(new java.awt.Dimension(280, 380));
@@ -132,12 +153,6 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
             }
         });
 
-        txtPrioridad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPrioridadActionPerformed(evt);
-            }
-        });
-
         jLabel14.setText("Procesos");
 
         recurso1.setText("Recurso1");
@@ -155,6 +170,18 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         });
 
         recurso3.setText("Recurso3");
+        recurso3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                recurso3ActionPerformed(evt);
+            }
+        });
+
+        prioridad.setText("Prioridad");
+        prioridad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prioridadActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jfrmProcesosLayout = new javax.swing.GroupLayout(jfrmProcesos.getContentPane());
         jfrmProcesos.getContentPane().setLayout(jfrmProcesosLayout);
@@ -163,38 +190,37 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
             .addGroup(jfrmProcesosLayout.createSequentialGroup()
                 .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jfrmProcesosLayout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jfrmProcesosLayout.createSequentialGroup()
+                                .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel12)
+                                    .addComponent(jLabel13))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                            .addGroup(jfrmProcesosLayout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addGap(26, 26, 26)))
+                        .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtNombre)
+                                .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                                .addComponent(txtmemoria))
+                            .addComponent(recurso1)
+                            .addComponent(recurso2)
+                            .addComponent(recurso3)
+                            .addComponent(prioridad)))
+                    .addGroup(jfrmProcesosLayout.createSequentialGroup()
                         .addGap(64, 64, 64)
                         .addComponent(jLabel3))
                     .addGroup(jfrmProcesosLayout.createSequentialGroup()
-                        .addGap(54, 54, 54)
-                        .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnagregarproceso)
-                            .addGroup(jfrmProcesosLayout.createSequentialGroup()
-                                .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jfrmProcesosLayout.createSequentialGroup()
-                                        .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel11)
-                                            .addComponent(jLabel12)
-                                            .addComponent(jLabel13))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                                    .addGroup(jfrmProcesosLayout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addGap(26, 26, 26)))
-                                .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(txtNombre)
-                                        .addComponent(txtPrioridad)
-                                        .addComponent(txtId, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                                        .addComponent(txtmemoria))
-                                    .addComponent(recurso1)
-                                    .addComponent(recurso2)
-                                    .addComponent(recurso3))
-                                .addGap(12, 12, 12))))
-                    .addGroup(jfrmProcesosLayout.createSequentialGroup()
                         .addGap(103, 103, 103)
-                        .addComponent(jLabel14)))
-                .addContainerGap(73, Short.MAX_VALUE))
+                        .addComponent(jLabel14))
+                    .addGroup(jfrmProcesosLayout.createSequentialGroup()
+                        .addGap(98, 98, 98)
+                        .addComponent(btnagregarproceso)))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
         jfrmProcesosLayout.setVerticalGroup(
             jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,7 +233,7 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
                 .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -218,7 +244,7 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
-                    .addComponent(txtPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(prioridad))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jfrmProcesosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
@@ -233,17 +259,20 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         );
 
         jfrmEjecutar.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        jfrmEjecutar.setMinimumSize(new java.awt.Dimension(750, 650));
+        jfrmEjecutar.setBackground(new java.awt.Color(51, 51, 51));
+        jfrmEjecutar.setMinimumSize(new java.awt.Dimension(780, 670));
+        jfrmEjecutar.setPreferredSize(new java.awt.Dimension(778, 670));
+        jfrmEjecutar.setSize(new java.awt.Dimension(780, 650));
 
         tablaEspera.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null},
+                {null},
+                {null},
+                {null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Title 1"
             }
         ));
         jScrollPane2.setViewportView(tablaEspera);
@@ -304,13 +333,13 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
 
         tablaprocesos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Title 1", "Title 2"
             }
         ));
         jScrollPane1.setViewportView(tablaprocesos);
@@ -324,81 +353,147 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
 
         jLabel6.setText("Nuevo");
 
+        Tablalogica.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2"
+            }
+        ));
+        jScrollPane6.setViewportView(Tablalogica);
+        if (Tablalogica.getColumnModel().getColumnCount() > 0) {
+            Tablalogica.getColumnModel().getColumn(0).setHeaderValue("Title 1");
+            Tablalogica.getColumnModel().getColumn(1).setHeaderValue("Title 2");
+        }
+
+        TablaVirtual.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2"
+            }
+        ));
+        jScrollPane7.setViewportView(TablaVirtual);
+
+        jLabel2.setText("Memoria Logica");
+
+        jLabel15.setText("Memoria Virtual");
+
         javax.swing.GroupLayout jfrmEjecutarLayout = new javax.swing.GroupLayout(jfrmEjecutar.getContentPane());
         jfrmEjecutar.getContentPane().setLayout(jfrmEjecutarLayout);
         jfrmEjecutarLayout.setHorizontalGroup(
             jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jfrmEjecutarLayout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(31, Short.MAX_VALUE)
                 .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel8)
                     .addGroup(jfrmEjecutarLayout.createSequentialGroup()
                         .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(63, 63, 63)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5))
+                        .addGap(18, 18, 18)
+                        .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10)))
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel8)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(65, 65, 65)
+                        .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel15)
+                            .addComponent(jLabel2)))
                     .addGroup(jfrmEjecutarLayout.createSequentialGroup()
                         .addComponent(btnejecutar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1))
-                    .addComponent(jLabel6))
-                .addGap(0, 576, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1)))
+                .addGap(57, 57, 57))
         );
         jfrmEjecutarLayout.setVerticalGroup(
             jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jfrmEjecutarLayout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
-                .addComponent(jLabel6)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel8)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jfrmEjecutarLayout.createSequentialGroup()
+                        .addContainerGap(17, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel15)))
+                .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jfrmEjecutarLayout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addGap(18, 18, 18)
-                        .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(19, 19, 19)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jfrmEjecutarLayout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jfrmEjecutarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnejecutar)
                     .addComponent(jButton1))
-                .addContainerGap())
+                .addGap(61, 61, 61))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("Simulador de Procesos");
 
-        jLabel2.setText("Digite la cantidad de Procesos a evaluar");
-
-        txtnumprocesos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtnumprocesosActionPerformed(evt);
-            }
-        });
-
-        btnnumprocesos.setText("Aceptar");
+        btnnumprocesos.setText("Procesos");
         btnnumprocesos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnnumprocesosActionPerformed(evt);
+            }
+        });
+
+        btnSalir.setText("Salir");
+        btnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalirActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Diagnostico");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
             }
         });
 
@@ -409,74 +504,74 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtnumprocesos)
-                            .addComponent(btnnumprocesos, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(73, 73, 73)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(57, Short.MAX_VALUE))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(92, 92, 92)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton2)
+                            .addComponent(btnnumprocesos, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(108, 108, 108)
+                        .addComponent(btnSalir)))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(55, 55, 55)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
-                .addComponent(jLabel2)
-                .addGap(33, 33, 33)
-                .addComponent(txtnumprocesos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
+                .addGap(18, 18, 18)
                 .addComponent(btnnumprocesos)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addGap(15, 15, 15)
+                .addComponent(jButton2)
+                .addGap(18, 18, 18)
+                .addComponent(btnSalir)
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtnumprocesosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtnumprocesosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtnumprocesosActionPerformed
-
     private void btnnumprocesosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnumprocesosActionPerformed
         
         jfrmProcesos.setVisible(true);
         jfrmProcesos.setLocationRelativeTo(null);
-        this.setVisible(false);
         
         
     }//GEN-LAST:event_btnnumprocesosActionPerformed
 
     private void btnagregarprocesoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarprocesoActionPerformed
-
-        int numprocesos=Integer.parseInt(txtnumprocesos.getText());
-   
-        String memoria=txtmemoria.getText();
+        if (nuevo.getRowCount()==CANTIDADP)
+            return;
+        int identificacion=Integer.parseInt(txtId.getText());
+        int memoria=Integer.parseInt(txtmemoria.getText());
+        boolean pri = this.prioridad.isSelected();
+        String nombre=txtNombre.getText();
         String recurso="";
         
-
-        l.aProceso(Integer.parseInt(memoria), procesos, recurso);
+        if(this.recurso1.isSelected())
+            recurso += "1";
+        if(this.recurso2.isSelected())
+            recurso += ((this.recurso1.isSelected())?",": "")+"2";
+        if(this.recurso3.isSelected())
+            recurso +=((this.recurso1.isSelected() 
+                    || this.recurso2.isSelected())?",":"")+"3";
+        l.aProceso(identificacion, nombre, memoria, pri, recurso);
         
         Object datos[]={l.procesos.get(procesos-1).vNombre(),memoria,recurso};
-        modelo.addRow(datos);
-
+        nuevo.addRow(datos);
+        
         txtmemoria.setText("");
-
-
-        if (modelo.getRowCount()==numprocesos){
-
-            jfrmEjecutar.setVisible(true);
-            jfrmEjecutar.setLocationRelativeTo(null);
-            jfrmProcesos.setVisible(false);
-        }
-            
+        txtId.setText("");
+        txtNombre.setText("");
+        recurso1.setSelected(false);
+        recurso2.setSelected(false);
+        recurso3.setSelected(false);
+        prioridad.setSelected(false);
         procesos++;
     }//GEN-LAST:event_btnagregarprocesoActionPerformed
-
+    
     private void txtmemoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtmemoriaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtmemoriaActionPerformed
@@ -486,22 +581,26 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         l.cambiarEstProceso(tiempo+1, numP);
         tmProc = 0;
         for (Proceso pro : l.procesos){
-            if(tiempo < tmProc)
+            
+            if(tiempo < tmProc || bProTer.indexOf(pro.vIdPro()) >= 0)
                 continue;
             if(pro.vEstado() == LISTO ){
-                Object datos1[]={pro.vNombre(),pro.vTamanio(),tiempo};
-                modelo1.addRow(datos1);
+                Object datos1[]={pro.vNombre()};
+                listo.addRow(datos1);
             }else if(pro.vEstado() == EJECUCION){
-                Object datos2[]={pro.vNombre(),pro.vTamanio(),tiempo};
-                modelo2.addRow(datos2);
-                if(pro.completo()){
-                    Object datos4[]={pro.vNombre(),tiempo};
-                    modelo4.addRow(datos4);
-                }
+                Object datos2[]={pro.vNombre()};
+                ejecucion.addRow(datos2);
+                memoria();
+                cambioMemoria();
             }else if(pro.vEstado() == BLOQUEADO ){
-                Object dato3[]={pro.vNombre(),tiempo};
-                modelo2.addRow(dato3);
-                modelo3.addRow(dato3);
+                Object dato3[]={pro.vNombre()};
+                ejecucion.addRow(dato3);
+                bloqueado.addRow(dato3);
+            }else if(pro.vEstado() == TERMINADO){
+                bProTer.add(pro.vIdPro());
+                Object datos4[]={pro.vNombre()};
+                ejecucion.addRow(datos4);
+                terminado.addRow(datos4);
             }
             tmProc++;
         }
@@ -511,27 +610,37 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
         else
             numP++;
         if(l.termina()){
-            System.out.println("acabo");
             temporizador.stop();
-            return;
         }else
             temporizador.restart();
-            
     }
-    private void btnejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnejecutarActionPerformed
-        temporizador = new Timer(delay, this);
-        temporizador.start();
-        
-    }//GEN-LAST:event_btnejecutarActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void txtPrioridadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrioridadActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPrioridadActionPerformed
-
+    private void cambioMemoria(){
+        int [][] memvir = l.memoria.memoriaV();
+        int [][] memlog = l.memoria.memoriaL();
+        Object datos[];
+        for(int i = 0; i < memvir.length; i++){
+            datos = new Object[]{i,memvir[i][0],memvir[i][1]};
+            memvirtual.addRow(datos);
+        }
+        for(int i = 0; i < memlog.length; i++){
+            datos = new Object[]{i,memlog[i][0],memlog[i][1]};
+            memlogica.addRow(datos);
+        }
+    }
+    private void memoria(){
+        try {
+            int filas=TablaVirtual.getRowCount();
+            for (int i = 0;filas>i; i++) {
+                memvirtual.removeRow(0);
+            }
+            filas=Tablalogica.getRowCount();
+            for (int i = 0;filas>i; i++) {
+                memlogica.removeRow(0);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al limpiar la tabla.");
+        }
+    }
     private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtIdActionPerformed
@@ -543,6 +652,33 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
     private void recurso2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recurso2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_recurso2ActionPerformed
+
+    private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
+        
+        System.exit(0);
+    }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        jfrmEjecutar.setVisible(true);
+        jfrmEjecutar.setLocationRelativeTo(null);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void recurso3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recurso3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_recurso3ActionPerformed
+
+    private void prioridadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prioridadActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_prioridadActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        temporizador.stop();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnejecutarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnejecutarActionPerformed
+        temporizador = new Timer(delay, this);
+        temporizador.start();
+    }//GEN-LAST:event_btnejecutarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -580,16 +716,21 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable TablaVirtual;
+    private javax.swing.JTable Tablalogica;
+    private javax.swing.JButton btnSalir;
     private javax.swing.JButton btnagregarproceso;
     private javax.swing.JButton btnejecutar;
     private javax.swing.JButton btnnumprocesos;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -603,8 +744,11 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JFrame jfrmEjecutar;
     private javax.swing.JFrame jfrmProcesos;
+    private javax.swing.JCheckBox prioridad;
     private javax.swing.JCheckBox recurso1;
     private javax.swing.JCheckBox recurso2;
     private javax.swing.JCheckBox recurso3;
@@ -615,8 +759,7 @@ public class Simulador extends javax.swing.JFrame implements ActionListener{
     private javax.swing.JTable tablaprocesos;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtNombre;
-    private javax.swing.JTextField txtPrioridad;
     private javax.swing.JTextField txtmemoria;
-    private javax.swing.JTextField txtnumprocesos;
     // End of variables declaration//GEN-END:variables
+
 }
